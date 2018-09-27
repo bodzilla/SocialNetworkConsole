@@ -34,10 +34,9 @@ namespace SocialNetworkConsole
         {
             // Get command.
             string input = Console.ReadLine();
-            string[] inputArray = input?.Split(' ').ToArray();
 
             // Process command.
-            if (inputArray != null)
+            if (!String.IsNullOrWhiteSpace(input))
             {
                 if (input.Contains("->"))
                 {
@@ -49,6 +48,7 @@ namespace SocialNetworkConsole
                 }
                 else
                 {
+                    string[] inputArray = input.Split(' ').ToArray();
                     switch (inputArray.Length)
                     {
                         case 1:
@@ -67,6 +67,7 @@ namespace SocialNetworkConsole
                     }
                 }
             }
+
             ShowMenu();
         }
 
@@ -107,13 +108,5 @@ namespace SocialNetworkConsole
             IList<Post> timeline = _socialNetworkService.GetUserTimeline(userName);
             foreach (Post post in timeline) Console.WriteLine($"{post.Text} ({post.TimeAgo()})");
         }
-
-        /// <summary>
-        /// Splits a string using another string.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="seperator"></param>
-        /// <returns></returns>
-        private static string[] Split(string value, string seperator) => value.Split(new string[] { seperator }, StringSplitOptions.None);
     }
 }
