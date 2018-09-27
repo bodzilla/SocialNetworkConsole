@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using SocialNetworkConsole.DataAccess;
 using SocialNetworkConsole.Models;
 
@@ -31,7 +32,7 @@ namespace SocialNetworkConsole.Services
         public int GetUserId(string userName)
         {
             // Construct and execute query.
-            string query = $"select id from [user] where [user].name = '{userName}';";
+            string query = $"select top 1 id from [user] where [user].name = '{userName}';";
             DataSet result = _dbConnection.ExecuteQuery(query);
 
             // Get User's id.
@@ -51,8 +52,9 @@ namespace SocialNetworkConsole.Services
             // Construct query.
             string query =
                 "select post.id, post.datecreated, post.text, post.userid " +
-                "from post inner join [user] on [user].id=post.userid " +
-                $"where [user].name = '{userName}';";
+                "from post inner join [user] on [user].id = post.userid " +
+                $"where [user].name = '{userName}' " +
+                "order by datecreated desc;";
 
             // Execute query.
             DataSet result = _dbConnection.ExecuteQuery(query);
@@ -71,6 +73,64 @@ namespace SocialNetworkConsole.Services
             }
 
             return timeline;
+        }
+
+        /// <summary>
+        /// Gets User's Wall.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns>Dictionary containing the post and the associated user.</returns>
+        public IDictionary<Post, string> GetUserWall(string userName)
+        {
+            IDictionary<Post, string> wall = new Dictionary<Post, string>();
+
+            // First get User's own Timeline.
+            IList<Post> userTimeline = GetUserTimeline(userName);
+            foreach (Post userPost in userTimeline) wall.Add(userPost, userName);
+
+            // Get all User's subscriptions.
+            IList<string> subscriptionUsernames = GetSubscriptionUserNames(userName);
+
+            // Get all the subscription's Timelines.
+            foreach (string subscriptionUserName in subscriptionUsernames)
+            {
+                IList<Post> subscriptionTimeline = GetUserTimeline(subscriptionUserName);
+                foreach (Post subscriptionPost in subscriptionTimeline) wall.Add(subscriptionPost, subscriptionUserName);
+            }
+
+            // Sort wall by date descending order.
+            return wall.OrderByDescending(x => x.Key.DateCreated).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// Gets the Usernames for all the the User's subscriptions.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        public IList<string> GetSubscriptionUserNames(string userName)
+        {
+            IList<string> subscribedUserNames = new List<string>();
+
+            // First, get the User's id.
+            int userId = GetUserId(userName);
+
+            // Construct query.
+            string query =
+                "select [user].name from dbo.[user] " +
+                "inner join follow on follow.followinguserid = [user].id " +
+                $"where follow.followeruserid = {userId};";
+
+            // Execute query.
+            DataSet result = _dbConnection.ExecuteQuery(query);
+
+            // Cast results to list.
+            foreach (DataRow row in result.Tables[0].Rows)
+            {
+                string name = row["name"].ToString();
+                subscribedUserNames.Add(name);
+            }
+
+            return subscribedUserNames;
         }
 
         /// <summary>

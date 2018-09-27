@@ -46,10 +46,8 @@
   <ItemGroup>
     <Compile Include="Services\SocialNetworkService.cs" />
     <Compile Include="DataAccess\DbConnection.cs" />
-    <Compile Include="Models\Follow.cs" />
     <Compile Include="Models\Interfaces\IBaseModel.cs" />
     <Compile Include="Models\Post.cs" />
-    <Compile Include="Models\User.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
