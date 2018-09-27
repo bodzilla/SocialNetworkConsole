@@ -22,10 +22,19 @@ namespace SocialNetworkConsole
             _socialNetworkService.CheckService();
 
             // Now handle the user's request(s).
-            PostToTimeline("Bodrul", "Posting this from the Social Network Console!");
+            //PostToTimeline("Bodrul", "Posting this from the Social Network Console!");
+            FollowUser("Bodrul", "Harry");
             ReadTimeline("Bodrul");
             Console.Read();
         }
+
+        /// <summary>
+        /// Make a User follow another User.
+        /// </summary>
+        /// <param name="followerUserName"></param>
+        /// <param name="followingUserName"></param>
+        private static void FollowUser(string followerUserName, string followingUserName) =>
+            _socialNetworkService.FollowUser(followerUserName, followingUserName);
 
         /// <summary>
         /// Post text to a User's Timeline.
