@@ -55,7 +55,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DbScripts\CreateScript.sql" />
+    <Content Include="DbScripts\CreateDbScript.sql" />
+    <Content Include="DbScripts\CreateTableAndDataScript.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
